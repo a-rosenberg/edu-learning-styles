@@ -22,9 +22,11 @@ def main():
     print(df.tail())
 
     print(
-        '\n', 'parsed:', nested_search.webpages_parsed,
-        '\n', 'matched:', nested_search.match_count,
+        '\n', 'pages parsed:', nested_search.webpages_parsed,
+        '\n', 'text matched:', nested_search.match_count,
     )
+
+    return nested_search
 
 
 class WebpageParser(object):
@@ -128,37 +130,37 @@ class WebpageParser(object):
 
 
 class NestedSearch(object):
-    global_search_urls = []
-    global_search_matches = []
-    global_search_depth = []
-    webpages_parsed = 0
-    max_depth = 1
-
     def __init__(self, root_url):
         """Nested Search Manager
 
         Args:
             root_url (str): URL to begin nested query.
 
-        Notes:
-            Because of shared class attributes, should only be instantiated once per environment.  Think of
-            it as a per-environment singleton.
+        Attributes:
+
         """
         self.root_webpage = WebpageParser(root_url)
         self.current_webpage = self.root_webpage
         self.current_depth = 1
+        self.max_depth = 1
+
+        self._search_result_urls = []
+        self._search_result_matches = []
+        self._search_result_depths = []
+
+        self.webpages_parsed = 0
 
     @property
     def results(self):
         return zip(
-            self.global_search_urls,
-            self.global_search_depth,
-            self.global_search_matches,
+            self._search_result_urls,
+            self._search_result_depths,
+            self._search_result_matches,
         )
 
     @property
     def match_count(self):
-        return len(self.global_search_matches)
+        return len(self._search_result_matches)
 
     def search(self, search_terms, n_char_buffer=25, max_depth=None, _current_depth=1):
         """
@@ -212,9 +214,9 @@ class NestedSearch(object):
 
     def _save_match(self, match):
         """Helper class to update global class attributes"""
-        self.global_search_urls.append(self.current_webpage.url)
-        self.global_search_depth.append(self.current_depth)
-        self.global_search_matches.append(match)
+        self._search_result_urls.append(self.current_webpage.url)
+        self._search_result_depths.append(self.current_depth)
+        self._search_result_matches.append(match)
 
     def _set_max_depth(self, new_max_depth):
         """Sets the max depth for recursion with class attribute across instances"""
@@ -226,11 +228,11 @@ class NestedSearch(object):
 
     def _reset_search(self):
         """Clears old results from search"""
-        self.global_search_depth = []
-        self.global_search_urls = []
-        self.global_search_matches = []
+        self._search_result_depths = []
+        self._search_result_urls = []
+        self._search_result_matches = []
         self.webpages_parsed = 0
 
 
 if __name__ == '__main__':
-    main()
+    nested_search = main()
