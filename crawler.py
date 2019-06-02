@@ -36,7 +36,7 @@ def generate_links(url, anchors):
                     yield href
                 else:
                     yield url + href
-            except:
+            except KeyError:
                 logging.debug('no href, skipping anchor element ... ')
 
 
