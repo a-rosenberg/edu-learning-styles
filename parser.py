@@ -145,10 +145,8 @@ class NestedSearch(object):
             it as a per-environment singleton.
         """
         self.root_webpage = WebpageParser(root_url)
-        self.current_webpage = WebpageParser(root_url)
+        self.current_webpage = self.root_webpage
         self.current_depth = 1
-
-        self.search_start_time = None
 
     @property
     def results(self):
