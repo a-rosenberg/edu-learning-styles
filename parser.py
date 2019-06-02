@@ -8,6 +8,25 @@ import lxml.html
 import pandas as pd
 
 
+def main():
+    logging.basicConfig(level=logging.INFO)
+
+    url = 'https://www.espn.com/'
+    nested_search = NestedSearch(url)
+    nested_search.search(
+        search_terms=['soccer', 'futbol'],
+        max_depth=2
+    )
+
+    df = nested_search.get_results_as_dataframe()
+    print(df.tail())
+
+    print(
+        '\n', 'parsed:', nested_search.webpages_parsed,
+        '\n', 'matched:', nested_search.match_count,
+    )
+
+
 class WebpageParser(object):
     def __init__(self, url):
         self.url = url
@@ -217,20 +236,4 @@ class NestedSearch(object):
 
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.INFO)
-
-    url = 'https://www.espn.com/'
-    nested_search = NestedSearch(url)
-    nested_search.search(
-        search_terms=['soccer', 'futbol'],
-        max_depth=2
-    )
-
-    df = nested_search.get_results_as_dataframe()
-    print(df.tail())
-
-    print(
-        '\n', 'parsed:', nested_search.webpages_parsed,
-        '\n', 'matched:', nested_search.match_count,
-    )
-
+    main()
