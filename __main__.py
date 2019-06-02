@@ -1,13 +1,14 @@
 import os
+import random
 
 import pandas as pd
 
+import parser
+
 search_terms = [
     'learning style',
-    'learning styles',
-    'learning strategy',
-    'learning strategies',
-    'visual learner',
+    'admissions',
+    'students',
 ]
 
 
@@ -19,6 +20,11 @@ def generate_name_and_url():
 
 
 if __name__ == '__main__':
-    roots = generate_name_and_url()
-    for name, url in roots:
-        print(name, url)
+    roots = list(generate_name_and_url())
+    random_samples = random.sample(roots, 5)
+    for name, url in random_samples:
+        print(name)
+        nested_search = parser.NestedSearch(url)
+        nested_search.search(search_terms, max_depth=1, n_char_buffer=25)
+        print(nested_search.get_results_as_dataframe().head())
+        print()

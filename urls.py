@@ -1,8 +1,25 @@
 import os
 import logging
+import datetime
 
 import pandas as pd
 import googlesearch
+
+
+def main():
+    logging.basicConfig(level=logging.INFO)
+
+    urls = get_university_tuples()
+
+    names = [x[0] for x in urls]
+    url_1 = [x[1][0] for x in urls]
+    url_2 = [x[1][1] for x in urls]
+    url_3 = [x[1][2] for x in urls]
+
+    df = pd.DataFrame({'name': names, 'url1': url_1, 'url2': url_2, 'url3': url_3, })
+    today = datetime.datetime.now().strftime('%m-%d-%Y')
+    output_path = os.path.join(os.path.dirname(__file__), 'data', 'url_cache', 'url_search_' + today + '.csv')
+    df.to_csv(output_path, index=False)
 
 
 def get_university_tuples():
@@ -50,5 +67,4 @@ def get_n_matching_google_result(names, n=3, pause=2.0):
 
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.INFO)
-    urls = get_university_tuples()
+    main()
