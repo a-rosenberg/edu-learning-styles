@@ -31,7 +31,6 @@ class WebpageParser(object):
     def __init__(self, url):
         self.url = url
         self.text = self._get_html()
-        self.text = self._get_html()
         self.root = self._parse_html()
         self.links = self._generate_links()
 
