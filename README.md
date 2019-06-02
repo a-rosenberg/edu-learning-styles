@@ -10,4 +10,6 @@ $ pip install -r requirements.txt
 ```
 
 ## Running
-`python parser.py`
+
+### examples
+`python parser.py` uses https://espn.com to test because they have the ability to handle lots of requests without significant sleep time.
