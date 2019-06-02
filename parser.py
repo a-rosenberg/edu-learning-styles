@@ -75,7 +75,7 @@ class WebpageParser(object):
         Returns:
             Generator (obj) of WebpageParser instances for linked URLs
         """
-        for link in self._generate_links():
+        for link in self.links():
             try:
                 yield WebpageParser(link)
             except lxml.etree.ParserError:
