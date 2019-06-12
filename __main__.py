@@ -1,6 +1,7 @@
 import os
 import random
 import logging
+import datetime
 
 import pandas as pd
 
@@ -9,8 +10,9 @@ import parser
 
 logging.basicConfig(level=logging.DEBUG)
 
-SAMPLES = 5
-ITER_DEPTH = 1
+TIMESTAMP = datetime.datetime.now().strftime('%Y-%m-%d_%H%M%S')
+SAMPLES = 3
+ITER_DEPTH = 2
 INPUT_FILE_BASENAME = 'url_search_06-02-2019_cleaned.csv'
 OUTPUT_COLUMNS = [
     'Name',
@@ -64,7 +66,7 @@ if __name__ == '__main__':
         os.path.join(
             os.path.dirname(__file__),
             'output',
-            'master_df.csv',
+            f'master_df_samples:{SAMPLES}_max_depth:{ITER_DEPTH}_{TIMESTAMP}.csv',
         ),
         index=False
     )
