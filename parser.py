@@ -92,6 +92,9 @@ class WebpageParser(object):
             except requests.exceptions.SSLError:
                 logging.warning('can not verify certs for webpage: %s', link)
                 continue
+            except requests.exceptions.ConnectionError:
+                logging.warning('hit max number of retries for webpage: %s', link)
+                continue
 
     def _generate_links(self):
         """Generate properly resolved links from anchor elements from root HTML.
