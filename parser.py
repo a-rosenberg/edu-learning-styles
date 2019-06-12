@@ -34,6 +34,7 @@ class WebpageParser(object):
         self.text = self._get_html()
         self.root = self._parse_html()
         self.links = self._generate_links()
+        logging.info('webpage contains %s links', len(list(self._generate_links())))
 
     def string_count_in_text(self, string, case_sensitive=False):
         """Counts number of string occurences in HTML text
@@ -70,7 +71,7 @@ class WebpageParser(object):
         for start_index in starting_locations:
             yield self.text[start_index - n_char_buffer:start_index + match_length + n_char_buffer]
 
-    def generate_linked_webpages(self):
+    def generate_linked_webpages(self, stay_on_base_site=False):
         """Generates WebpageParser objects for valid links in current WebpageParser object
 
         Returns:
@@ -78,7 +79,13 @@ class WebpageParser(object):
         """
         for link in self.links:
             try:
-                yield WebpageParser(link)
+                if link.startswith(self.url):
+                    yield WebpageParser(link)
+                else:
+                    if stay_on_base_site:
+                        logging.debug('skipped non-base link: %s', link)
+                    else:
+                        yield WebpageParser(link)
             except lxml.etree.ParserError:
                 logging.warning('can not parse webpage: %s', link)
                 continue
@@ -145,6 +152,7 @@ class NestedSearch(object):
 
         self._search_result_urls = []
         self._search_result_matches = []
+        self._search_result_keyword = []
         self._search_result_depths = []
 
         self.webpages_parsed = 0
@@ -154,6 +162,7 @@ class NestedSearch(object):
         return zip(
             self._search_result_urls,
             self._search_result_depths,
+            self._search_result_keyword,
             self._search_result_matches,
         )
 
@@ -202,20 +211,21 @@ class NestedSearch(object):
         Returns:
             pd.DataFrame of class search results.
         """
-        return pd.DataFrame(self.results, columns=['URL', 'Query_Depth', 'Matching_Text'])
+        return pd.DataFrame(self.results, columns=['URL', 'Query_Depth', 'Matching_Keyword', 'Matching_Text'])
 
     def _register_text_matches(self, search_terms, n_char_buffer):
         """Saves matches for all search terms to class """
         search_terms = search_terms if isinstance(search_terms, list) else [search_terms]
         for search_term in search_terms:
             for match in self.current_webpage.generate_match_surrounding_text(search_term, n_char_buffer=n_char_buffer):
-                self._save_match(match)
+                self._save_match(match, search_term)
 
-    def _save_match(self, match):
+    def _save_match(self, match, search_term):
         """Helper class to update global class attributes"""
         self._search_result_urls.append(self.current_webpage.url)
         self._search_result_depths.append(self.current_depth)
         self._search_result_matches.append(match)
+        self._search_result_keyword.append(search_term)
 
     def _set_max_depth(self, new_max_depth):
         """Sets the max depth for recursion with class attribute across instances"""
