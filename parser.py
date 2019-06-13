@@ -80,13 +80,14 @@ class WebpageParser(object):
         """
         for link in self.links:
             try:
-                if link.startswith(self.url) and not link.endswith('.pdf'):
-                    yield WebpageParser(link)
-                else:
-                    if stay_on_base_site:
-                        logging.debug('skipped non-base link: %s', link)
-                    else:
+                if not link.endswith('.pdf'):
+                    if link.startswith(self.url):
                         yield WebpageParser(link)
+                    else:
+                        if stay_on_base_site:
+                            logging.debug('skipped non-base link: %s', link)
+                        else:
+                            yield WebpageParser(link)
             except lxml.etree.ParserError:
                 logging.warning('can not parse webpage: %s', link)
                 continue
