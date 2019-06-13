@@ -33,8 +33,9 @@ class WebpageParser(object):
         self.url = url
         self.text = self._get_html()
         self.root = self._parse_html()
-        self.links = self._generate_links()
-        logging.info('webpage contains %s links', len(list(self._generate_links())))
+        self.links = list(self._generate_links())
+
+        logging.info('webpage contains %s links', len(self.links))
 
     def string_count_in_text(self, string, case_sensitive=False):
         """Counts number of string occurences in HTML text
@@ -79,7 +80,7 @@ class WebpageParser(object):
         """
         for link in self.links:
             try:
-                if link.startswith(self.url):
+                if link.startswith(self.url) and not link.endswith('.pdf'):
                     yield WebpageParser(link)
                 else:
                     if stay_on_base_site:
@@ -103,6 +104,7 @@ class WebpageParser(object):
             Generator (str) for linked URL strings.
         """
         for anchor in self._get_anchor_elements():
+
             try:
                 href = anchor.attrib['href']
                 if href.startswith('http'):
@@ -114,6 +116,7 @@ class WebpageParser(object):
 
     def _get_html(self):
         """Returns HTML as text"""
+        logging.info('requesting %s', self.url)
         response = requests.get(self.url)
         return response.text
 
